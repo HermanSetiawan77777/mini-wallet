@@ -6,11 +6,11 @@ import (
 )
 
 type Session struct {
-	UserId string
+	WalletId string
 }
 
 func (s *Session) Validate() error {
-	if s.UserId == "" {
+	if s.WalletId == "" {
 		return errors.ErrInvalidSession
 	}
 
