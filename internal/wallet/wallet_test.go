@@ -58,10 +58,10 @@ func TestWalletService_GetWalletByCustomerXid(t *testing.T) {
 			},
 		)
 
-		convey.Convey("It should return the user", func() {
-			newUser, err := service.GetByCustomerXid(context.TODO(), "Xid")
+		convey.Convey("It should return the wallet", func() {
+			newWallet, err := service.GetByCustomerXid(context.TODO(), "Xid")
 			convey.So(err, convey.ShouldBeNil)
-			convey.So(newUser, convey.ShouldEqual, currentWallet)
+			convey.So(newWallet, convey.ShouldEqual, currentWallet)
 		})
 	})
 }

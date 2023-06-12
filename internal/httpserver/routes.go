@@ -13,7 +13,7 @@ func buildRoutes(appContainer *app.Application) http.Handler {
 	root := mux.NewRouter()
 
 	root.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		response.WithData(w, http.StatusOK, "Server is running")
+		response.WithData(w, http.StatusOK, "Server is running", "success")
 	}).Methods(http.MethodGet)
 
 	root.HandleFunc("/api/v1/tokens", authhttp.HandleGetToken(appContainer.Services.AuthService)).Methods(http.MethodPost)

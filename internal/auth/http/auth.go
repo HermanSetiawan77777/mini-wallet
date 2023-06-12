@@ -35,9 +35,8 @@ func HandleGetToken(service auth.AuthIService) http.HandlerFunc {
 			response.WithError(w, err)
 			return
 		}
-
 		response.WithData(w, http.StatusOK, &GetTokenResponse{
 			Token: token,
-		})
+		}, "success")
 	}
 }
