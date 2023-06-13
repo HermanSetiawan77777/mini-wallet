@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -74,6 +75,14 @@ func (s *WalletService) GetByLinkedWallet(ctx context.Context, walletId string) 
 	wallet, err := s.repository.GetByLinkedWallet(ctx, walletId)
 	if err != nil {
 		return nil, err
+	}
+	checkWallet, err := s.repository.GetByWalletId(ctx, walletId)
+	if err != nil {
+		return nil, err
+	}
+	if checkWallet.StatusId == 1 {
+		fmt.Println("pass")
+		return nil, ErrWalletDeactive
 	}
 	return wallet, nil
 }

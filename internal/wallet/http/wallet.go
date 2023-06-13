@@ -31,3 +31,22 @@ func HandleEnableWallet(walletService wallet.WalletIService) http.HandlerFunc {
 		}, "Success")
 	}
 }
+
+func HandleViewWallet(walletService wallet.WalletIService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		currentSession, err := auth.GetSessionFromContext(r.Context())
+		if err != nil {
+			response.WithError(w, err)
+			return
+		}
+
+		targetWallet, err := walletService.GetByLinkedWallet(r.Context(), currentSession.WalletId)
+		if err != nil {
+			response.WithError(w, err)
+			return
+		}
+		response.WithData(w, http.StatusOK, &GetEnabledResponse{
+			Wallet: targetWallet,
+		}, "Success")
+	}
+}

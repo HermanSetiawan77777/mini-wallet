@@ -13,7 +13,6 @@ import (
 type Session struct {
 	WalletId    string
 	CustomerXid string
-	Status      int
 }
 
 func (s *Session) Validate() error {
@@ -68,7 +67,6 @@ func (s *AuthService) Authenticate(ctx context.Context, customerXid string) (tok
 	session := &Session{
 		WalletId:    currentSession.WalletId,
 		CustomerXid: currentSession.CustomerXid,
-		Status:      currentSession.StatusId,
 	}
 	expiryTime := 24 * time.Hour
 	token, err = s.tokener.GenerateToken(ctx, session, &expiryTime)

@@ -126,7 +126,7 @@ func (s *WalletSQLRepository) GetByLinkedWallet(ctx context.Context, walletId st
 	if walletId == "" {
 		return nil, nil
 	}
-	err := db.Model(&LinkedWalletDetail{}).Select("wallet.wallet_id, wallet.customer_xid, wallet.balance, wallet_activation_log.date_log, status_wallet.status").Joins("INNER join wallet_activation_log on wallet.wallet_id = wallet_activation_log.wallet_id").Joins("INNER join status_wallet on status_wallet.status_id = wallet.status_id").Where("wallet.wallet_id = ?", walletId).Order("wallet_activation_log.date_log desc").Scan(&data).Error
+	err := db.Model(&LinkedWalletDetail{}).Select("wallet.wallet_id, wallet.customer_xid, wallet.balance, wallet_activation_log.date_log, status_wallet.status").Joins("INNER join wallet_activation_log on wallet.wallet_id = wallet_activation_log.wallet_id").Joins("INNER join status_wallet on status_wallet.status_id = wallet.status_id").Where("wallet.wallet_id = ?", walletId).Order("wallet_activation_log.date_log desc").Scan(&data).First(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

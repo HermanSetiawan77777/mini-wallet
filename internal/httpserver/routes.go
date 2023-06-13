@@ -24,9 +24,11 @@ func buildRoutes(appContainer *app.Application) http.Handler {
 	authRouter := root.NewRoute().Subrouter()
 	authRouter.Use(muxauth.AuthenticateRequest(authenticator.NewJULOWebAuthenticator(appContainer.Services.AuthService)))
 	authRouter.HandleFunc("/test/authenticate", func(w http.ResponseWriter, r *http.Request) {
-		response.WithData(w, http.StatusOK, "authenticated", "success")
+		response.WithData(w, http.StatusOK, "authenticated", "Authenticated")
 	}).Methods(http.MethodGet)
+
 	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleEnableWallet(appContainer.Services.WalletService)).Methods(http.MethodPost)
+	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleViewWallet(appContainer.Services.WalletService)).Methods(http.MethodGet)
 
 	return root
 }
