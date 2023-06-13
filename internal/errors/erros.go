@@ -11,6 +11,9 @@ func NewValidationError(code, message, detail string) HandledError {
 func NewUnprocessableEntity(code, message, detail string) HandledError {
 	return NewHandledError(http.StatusUnprocessableEntity, code, message, detail)
 }
+func NewDefaultValidationError(message, detail string) HandledError {
+	return NewHandledError(http.StatusBadRequest, "VLD0001", message, detail)
+}
 
 var ErrInvalidSession = NewUnauthorizedError("COMM0001", "Unauthorized", "invalid session")
 var ErrEmptyPayload = NewValidationError("COMM0002", "Please fill data", "request body is empty")

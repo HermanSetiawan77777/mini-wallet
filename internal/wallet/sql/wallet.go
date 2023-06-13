@@ -51,6 +51,29 @@ func (s *WalletSQLRepository) GetByCustomerXid(ctx context.Context, customerXid 
 	return data.ToServiceModel(), nil
 }
 
+func newWalletFromServiceModel(data *wallet.Wallet) *Wallet {
+	if data == nil {
+		return nil
+	}
+
+	return &Wallet{
+		WalletId:    data.WalletId,
+		CustomerXid: data.CustomerXid,
+		StatusId:    data.StatusId,
+		Balance:     data.Balance,
+	}
+}
+
+func (s *WalletSQLRepository) Create(ctx context.Context, params *wallet.Wallet) error {
+	payload := newWalletFromServiceModel(params)
+	errs := s.db.Create(&payload).Error
+	if errs != nil {
+		return errs
+	}
+
+	return nil
+}
+
 func (s *WalletSQLRepository) getDatabaseClient(ctx context.Context) *gorm.DB {
 	db := sqlgorm.GetClientFromContext(ctx)
 	if db != nil {

@@ -6,6 +6,8 @@ import (
 	"herman-technical-julo/internal/token"
 	"herman-technical-julo/internal/wallet"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Session struct {
@@ -45,7 +47,22 @@ func (s *AuthService) Authenticate(ctx context.Context, customerXid string) (tok
 		return "", err
 	}
 	if currentSession == nil {
-		return "", ErrCredentialsInvalid
+		id := uuid.New()
+		idString := id.String()
+		err = s.walletService.InitializeWallet(ctx, &wallet.InitializeWalletParam{
+			WalletId:    idString,
+			CustomerXid: customerXid,
+			StatusId:    0,
+			Balance:     0,
+		})
+		if err != nil {
+			return "", err
+		}
+
+		currentSession, err = s.walletService.GetByCustomerXid(ctx, customerXid)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	session := &Session{

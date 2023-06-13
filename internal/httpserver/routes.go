@@ -16,7 +16,7 @@ func buildRoutes(appContainer *app.Application) http.Handler {
 		response.WithData(w, http.StatusOK, "Server is running", "success")
 	}).Methods(http.MethodGet)
 
-	root.HandleFunc("/api/v1/tokens", authhttp.HandleGetToken(appContainer.Services.AuthService)).Methods(http.MethodPost)
+	root.HandleFunc("/api/v1/init", authhttp.HandleGetToken(appContainer.Services.AuthService)).Methods(http.MethodPost)
 
 	return root
 }
