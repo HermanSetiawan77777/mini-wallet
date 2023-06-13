@@ -91,6 +91,9 @@ func (s *WalletService) EnableWallet(ctx context.Context, params *UpdateWalletPa
 	if targetWallet == nil {
 		return nil, ErrWalletIdNotExist
 	}
+	if targetWallet.StatusId == 2 {
+		return nil, ErrWalletAlreadyEnabled
+	}
 	targetWallet.StatusId = 2
 	if targetWallet.StatusId == 0 {
 		return nil, ErrStatusZero
