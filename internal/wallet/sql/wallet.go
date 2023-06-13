@@ -129,3 +129,15 @@ func (s *WalletSQLRepository) getDatabaseClient(ctx context.Context) *gorm.DB {
 
 	return s.db
 }
+
+func (s *WalletSQLRepository) Update(ctx context.Context, payload *wallet.Wallet) error {
+	db := s.getDatabaseClient(ctx)
+	newWallet := newWalletFromServiceModel(payload)
+
+	err := db.Where("wallet_id = ?", payload.WalletId).Select("*").Updates(&newWallet).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
