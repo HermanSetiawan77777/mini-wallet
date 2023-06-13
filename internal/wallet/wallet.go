@@ -32,6 +32,7 @@ type WalletIService interface {
 	InitializeWallet(ctx context.Context, params *InitializeWalletParam) error
 	GetByLinkedWallet(ctx context.Context, walletId string) (*WalletDetail, error)
 	EnableWallet(ctx context.Context, payload *UpdateWalletParam) (*WalletDetail, error)
+	GetByWalletId(ctx context.Context, walletId string) (*Wallet, error)
 }
 
 type WalletService struct {
@@ -45,6 +46,14 @@ func NewWalletService(
 
 func (w *WalletService) GetByCustomerXid(ctx context.Context, customerXid string) (*Wallet, error) {
 	wallet, err := w.repository.GetByCustomerXid(ctx, customerXid)
+	if err != nil {
+		return nil, err
+	}
+	return wallet, nil
+}
+
+func (w *WalletService) GetByWalletId(ctx context.Context, walletId string) (*Wallet, error) {
+	wallet, err := w.repository.GetByWalletId(ctx, walletId)
 	if err != nil {
 		return nil, err
 	}

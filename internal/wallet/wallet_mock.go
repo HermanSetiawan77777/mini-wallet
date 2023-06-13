@@ -55,6 +55,7 @@ type WalletServiceMock struct {
 	InitializeWalletFunc  func(ctx context.Context, params *InitializeWalletParam) error
 	GetByLinkedWalletFunc func(ctx context.Context, walletId string) (*WalletDetail, error)
 	EnableWalletFunc      func(ctx context.Context, payload *UpdateWalletParam) (*WalletDetail, error)
+	GetByWalletIdFunc     func(ctx context.Context, walletId string) (*Wallet, error)
 }
 
 func (m *WalletServiceMock) GetByCustomerXid(ctx context.Context, customerXid string) (*Wallet, error) {
@@ -87,4 +88,12 @@ func (m *WalletServiceMock) EnableWallet(ctx context.Context, payload *UpdateWal
 	}
 
 	return &WalletDetail{}, nil
+}
+
+func (m *WalletServiceMock) GetByWalletId(ctx context.Context, WalletId string) (*Wallet, error) {
+	if m.GetByWalletIdFunc != nil {
+		return m.GetByWalletIdFunc(ctx, WalletId)
+	}
+
+	return &Wallet{}, nil
 }
