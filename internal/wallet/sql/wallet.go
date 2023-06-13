@@ -73,6 +73,21 @@ func (s *WalletSQLRepository) GetByCustomerXid(ctx context.Context, customerXid 
 	return data.ToServiceModel(), nil
 }
 
+func (s *WalletSQLRepository) GetByWalletId(ctx context.Context, customerXid string) (*wallet.Wallet, error) {
+	var data *Wallet
+	db := s.getDatabaseClient(ctx)
+
+	err := db.Where("wallet_id = ?", customerXid).First(&data).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return data.ToServiceModel(), nil
+}
+
 func newWalletFromServiceModel(data *wallet.Wallet) *Wallet {
 	if data == nil {
 		return nil
@@ -111,7 +126,7 @@ func (s *WalletSQLRepository) GetByLinkedWallet(ctx context.Context, walletId st
 	if walletId == "" {
 		return nil, nil
 	}
-	err := db.Model(&LinkedWalletDetail{}).Select("SELECT top 1 wallet.wallet_id, wallet.customer_xid, wallet.balance, wallet_activation_log.date_log,status_wallet.status").Joins("INNER join wallet_activation_log on wallet.wallet_id = wallet_activation_log.wallet_id").Joins("INNER join status_wallet on status_wallet.wallet_id = wallet.wallet_id").Where("wallet.wallet_id = ?", walletId).Order("wallet_activation_log.date_log desc").Scan(&data).Error
+	err := db.Model(&LinkedWalletDetail{}).Select("wallet.wallet_id, wallet.customer_xid, wallet.balance, wallet_activation_log.date_log, status_wallet.status").Joins("INNER join wallet_activation_log on wallet.wallet_id = wallet_activation_log.wallet_id").Joins("INNER join status_wallet on status_wallet.status_id = wallet.status_id").Where("wallet.wallet_id = ?", walletId).Order("wallet_activation_log.date_log desc").Scan(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

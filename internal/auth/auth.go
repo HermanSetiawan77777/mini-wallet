@@ -52,7 +52,7 @@ func (s *AuthService) Authenticate(ctx context.Context, customerXid string) (tok
 		err = s.walletService.InitializeWallet(ctx, &wallet.InitializeWalletParam{
 			WalletId:    idString,
 			CustomerXid: customerXid,
-			StatusId:    0,
+			StatusId:    1,
 			Balance:     0,
 		})
 		if err != nil {

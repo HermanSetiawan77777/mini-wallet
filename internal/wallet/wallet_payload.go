@@ -16,3 +16,16 @@ func (p *InitializeWalletParam) Validate() error {
 	}
 	return nil
 }
+
+type UpdateWalletParam struct {
+	WalletId string `json:"wallet_id"`
+	StatusId int    `json:"status_id"`
+	Balance  int    `json:"balance"`
+}
+
+func (p *UpdateWalletParam) Validate() error {
+	if p.WalletId == "" {
+		return ErrWalletIdNil
+	}
+	return nil
+}
