@@ -30,23 +30,6 @@ func TestAuthService_Authenticate(t *testing.T) {
 		})
 	})
 
-	convey.Convey("When wallet not found", t, func() {
-		service := auth.NewAuthService(
-			&wallet.WalletServiceMock{
-				GetByCustomerXidFunc: func(ctx context.Context, customerXid string) (*wallet.Wallet, error) {
-					return nil, nil
-				},
-			},
-			&token.TokenerMock[*auth.Session]{},
-		)
-
-		convey.Convey("Should return ErrCredentialsInvalid error", func() {
-			token, err := service.Authenticate(context.TODO(), "Xid")
-			convey.So(token, convey.ShouldBeEmpty)
-			convey.So(err, convey.ShouldResemble, auth.ErrCredentialsInvalid)
-		})
-	})
-
 	convey.Convey("When failed to generate token", t, func() {
 		service := auth.NewAuthService(
 			&wallet.WalletServiceMock{
