@@ -4,6 +4,7 @@ import (
 	"context"
 	sqlgorm "herman-technical-julo/internal/data/sql/gorm"
 	"herman-technical-julo/internal/wallet"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -16,6 +17,18 @@ type Wallet struct {
 }
 
 func (Wallet) TableName() string {
+	return "wallet"
+}
+
+type LinkedWalletDetail struct {
+	WalletId    string    `gorm:"column:wallet_id"`
+	CustomerXid string    `gorm:"column:customer_xid"`
+	Balance     string    `gorm:"column:balance"`
+	DateLog     time.Time `gorm:"column:date_log"`
+	Status      string    `gorm:"column:status"`
+}
+
+func (LinkedWalletDetail) TableName() string {
 	return "wallet"
 }
 
@@ -33,6 +46,15 @@ func (w *Wallet) ToServiceModel() *wallet.Wallet {
 		CustomerXid: w.CustomerXid,
 		StatusId:    w.StatusId,
 		Balance:     w.Balance,
+	}
+}
+
+func (w *LinkedWalletDetail) ToLinkedServiceModel() *wallet.WalletDetail {
+	return &wallet.WalletDetail{
+		WalletId:    w.WalletId,
+		CustomerXid: w.CustomerXid,
+		Status:      w.Status,
+		DateLog:     w.DateLog,
 	}
 }
 
@@ -72,6 +94,31 @@ func (s *WalletSQLRepository) Create(ctx context.Context, params *wallet.Wallet)
 	}
 
 	return nil
+}
+
+func (c *LinkedWalletDetail) ToServiceModelDetail() *wallet.WalletDetail {
+	return &wallet.WalletDetail{
+		WalletId:    c.WalletId,
+		CustomerXid: c.CustomerXid,
+		Status:      c.Status,
+		DateLog:     c.DateLog,
+	}
+}
+
+func (s *WalletSQLRepository) GetByLinkedWallet(ctx context.Context, walletId string) (*wallet.WalletDetail, error) {
+	var data *LinkedWalletDetail
+	db := s.getDatabaseClient(ctx)
+	if walletId == "" {
+		return nil, nil
+	}
+	err := db.Model(&LinkedWalletDetail{}).Select("SELECT top 1 wallet.wallet_id, wallet.customer_xid, wallet.balance, wallet_activation_log.date_log,status_wallet.status").Joins("INNER join wallet_activation_log on wallet.wallet_id = wallet_activation_log.wallet_id").Joins("INNER join status_wallet on status_wallet.wallet_id = wallet.wallet_id").Where("wallet.wallet_id = ?", walletId).Order("wallet_activation_log.date_log desc").Scan(&data).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return data.ToLinkedServiceModel(), nil
 }
 
 func (s *WalletSQLRepository) getDatabaseClient(ctx context.Context) *gorm.DB {

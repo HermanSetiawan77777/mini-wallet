@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"context"
+	"time"
 )
 
 type Wallet struct {
@@ -10,14 +11,23 @@ type Wallet struct {
 	StatusId    int    `json:"status_id"`
 	Balance     int    `json:"balance"`
 }
+
+type WalletDetail struct {
+	WalletId    string    `json:"wallet_id"`
+	CustomerXid string    `json:"customer_xid"`
+	Status      string    `json:"status"`
+	DateLog     time.Time `json:"enabled_at"`
+}
 type WalletRepository interface {
 	GetByCustomerXid(ctx context.Context, customerXid string) (*Wallet, error)
 	Create(ctx context.Context, params *Wallet) error
+	GetByLinkedWallet(ctx context.Context, walletId string) (*WalletDetail, error)
 }
 
 type WalletIService interface {
 	GetByCustomerXid(ctx context.Context, customerXid string) (*Wallet, error)
 	InitializeWallet(ctx context.Context, params *InitializeWalletParam) error
+	GetByLinkedWallet(ctx context.Context, walletId string) (*WalletDetail, error)
 }
 
 type WalletService struct {
@@ -54,4 +64,12 @@ func (s *WalletService) InitializeWallet(ctx context.Context, params *Initialize
 	}
 
 	return nil
+}
+
+func (s *WalletService) GetByLinkedWallet(ctx context.Context, walletId string) (*WalletDetail, error) {
+	wallet, err := s.repository.GetByLinkedWallet(ctx, walletId)
+	if err != nil {
+		return nil, err
+	}
+	return wallet, nil
 }
