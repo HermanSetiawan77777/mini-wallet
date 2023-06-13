@@ -7,4 +7,4 @@ var ErrCustomerXidNil = errors.NewDefaultValidationError("Customer xid cannot be
 var ErrStatusZero = errors.NewDefaultValidationError("Status cannot 0", "status cannot 0")
 var ErrWalletIdNotExist = errors.NewDefaultValidationError("Wallet id not exist", "Wallet id not exist")
 var ErrWalletAlreadyEnabled = errors.NewDefaultValidationError("Failed, Wallet already enabled", "failed, wallet already enabled")
-var ErrWalletDeactive = errors.NewDefaultValidationError("Failed, Wallet not enabled", "failed, wallet not enabled")
+var ErrWalletDeactive = errors.NewDefaultValidationError("Wallet disabled", "wallet disabled")

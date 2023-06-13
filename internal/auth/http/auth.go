@@ -23,16 +23,16 @@ func HandleGetToken(service auth.AuthIService) http.HandlerFunc {
 		err := request.DecodeBody(r, &requestBody)
 		if err != nil {
 			if err == errors.ErrEmptyPayload {
-				response.WithError(w, err)
+				response.WithError(w, err, "fail")
 				return
 			}
-			response.WithError(w, errors.ErrUnprocessablePayload)
+			response.WithError(w, errors.ErrUnprocessablePayload, "fail")
 			return
 		}
 
 		token, err := service.Authenticate(r.Context(), requestBody.CustomerXid)
 		if err != nil {
-			response.WithError(w, err)
+			response.WithError(w, err, "fail")
 			return
 		}
 		response.WithData(w, http.StatusOK, &GetTokenResponse{

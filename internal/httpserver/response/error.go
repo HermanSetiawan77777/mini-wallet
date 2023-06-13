@@ -5,10 +5,11 @@ import (
 	"net/http"
 )
 
-func WithError(w http.ResponseWriter, err error) {
+func WithError(w http.ResponseWriter, err error, message string) {
 	handledError := defineError(err)
 	withJSON(w, handledError.HttpStatus, map[string]any{
-		"error": handledError,
+		"error":  handledError,
+		"status": message,
 	})
 }
 

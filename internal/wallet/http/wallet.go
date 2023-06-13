@@ -15,7 +15,7 @@ func HandleEnableWallet(walletService wallet.WalletIService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		currentSession, err := auth.GetSessionFromContext(r.Context())
 		if err != nil {
-			response.WithError(w, err)
+			response.WithError(w, err, "fail")
 			return
 		}
 
@@ -23,7 +23,7 @@ func HandleEnableWallet(walletService wallet.WalletIService) http.HandlerFunc {
 			WalletId: currentSession.WalletId,
 		})
 		if err != nil {
-			response.WithError(w, err)
+			response.WithError(w, err, "fail")
 			return
 		}
 		response.WithData(w, http.StatusOK, &GetEnabledResponse{
@@ -36,13 +36,13 @@ func HandleViewWallet(walletService wallet.WalletIService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		currentSession, err := auth.GetSessionFromContext(r.Context())
 		if err != nil {
-			response.WithError(w, err)
+			response.WithError(w, err, "fail")
 			return
 		}
 
 		targetWallet, err := walletService.GetByLinkedWallet(r.Context(), currentSession.WalletId)
 		if err != nil {
-			response.WithError(w, err)
+			response.WithError(w, err, "fail")
 			return
 		}
 		response.WithData(w, http.StatusOK, &GetEnabledResponse{

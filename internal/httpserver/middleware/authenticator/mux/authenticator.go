@@ -13,7 +13,7 @@ func AuthenticateRequest(authenticator authenticator.RequestAuthenticator) mux.M
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx, err := authenticator.Validate(w, r)
 			if err != nil {
-				response.WithError(w, err)
+				response.WithError(w, err, "fail")
 				return
 			}
 

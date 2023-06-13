@@ -2,7 +2,6 @@ package wallet
 
 import (
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -81,7 +80,6 @@ func (s *WalletService) GetByLinkedWallet(ctx context.Context, walletId string) 
 		return nil, err
 	}
 	if checkWallet.StatusId == 1 {
-		fmt.Println("pass")
 		return nil, ErrWalletDeactive
 	}
 	return wallet, nil
