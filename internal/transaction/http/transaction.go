@@ -11,7 +11,7 @@ type GetViewTransactionResponse struct {
 	transaction.ViewTransactionWallet `json:"transaction"`
 }
 
-func HandleViewWallet(transactionService transaction.TransactionWalletIService) http.HandlerFunc {
+func HandleViewTransaction(transactionService transaction.TransactionWalletIService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		currentSession, err := auth.GetSessionFromContext(r.Context())
 		if err != nil {

@@ -19,7 +19,7 @@ func HandleEnableWallet(walletService wallet.WalletIService) http.HandlerFunc {
 			return
 		}
 
-		targetWallet, err := walletService.EnableWallet(r.Context(), &wallet.UpdateWalletParam{
+		targetWallet, err := walletService.EnableWallet(r.Context(), &wallet.EnableWalletParam{
 			WalletId: currentSession.WalletId,
 		})
 		if err != nil {

@@ -36,16 +36,17 @@ func NewTransactionWalletService(
 }
 
 func (s *TransactionWalletService) ViewMyTransactionWallet(ctx context.Context, walletId string) ([]*ViewTransactionWallet, error) {
-	transactionWallet, err := s.repository.ViewMyTransactionWallet(ctx, walletId)
-	if err != nil {
-		return nil, err
-	}
 	checkWallet, err := s.walletService.GetByWalletId(ctx, walletId)
 	if err != nil {
 		return nil, err
 	}
 	if checkWallet.StatusId == 1 {
 		return nil, ErrTransactionWalletDeactive
+	}
+
+	transactionWallet, err := s.repository.ViewMyTransactionWallet(ctx, walletId)
+	if err != nil {
+		return nil, err
 	}
 	return transactionWallet, nil
 }
