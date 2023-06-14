@@ -10,3 +10,4 @@ var ErrTransactionByNil = errors.NewDefaultValidationError("Transaction by canno
 var ErrAmountZero = errors.NewDefaultValidationError("Amount cannot 0", "amount cannot 0")
 var ErrReferenceIdNil = errors.NewDefaultValidationError("Reference id cannot empty", "reference id cannot empty")
 var ErrWalletDeactive = errors.NewDefaultValidationError("Wallet disabled", "wallet disabled")
+var ErrAmountNotEnough = errors.NewDefaultValidationError("Amount is not enough", "amount is not enough")

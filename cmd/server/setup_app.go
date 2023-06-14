@@ -4,6 +4,8 @@ import (
 	"herman-technical-julo/config"
 	"herman-technical-julo/internal/app"
 	"herman-technical-julo/internal/auth"
+	"herman-technical-julo/internal/log/walletlog"
+	walletlogsql "herman-technical-julo/internal/log/walletlog/sql"
 	jwtservice "herman-technical-julo/internal/token/jwt"
 	"herman-technical-julo/internal/transaction"
 	transactionsql "herman-technical-julo/internal/transaction/sql"
@@ -35,8 +37,8 @@ func setupServices(dbs *databases) *app.Services {
 
 func setupWalletService(julodb *gorm.DB) wallet.WalletIService {
 	repo := walletsql.NewWalletSQLRepository(julodb)
-
-	walletService := wallet.NewWalletService(repo)
+	walletLogService := setupWalletLogService(julodb)
+	walletService := wallet.NewWalletService(repo, walletLogService)
 	return walletService
 }
 
@@ -50,5 +52,12 @@ func setupTransactionService(julodb *gorm.DB) transaction.TransactionWalletIServ
 	repo := transactionsql.NewTransactionWalletSQLRepository(julodb)
 
 	transactionService := transaction.NewTransactionWalletService(repo, setupWalletService(julodb))
+	return transactionService
+}
+
+func setupWalletLogService(julodb *gorm.DB) walletlog.WalletLogIService {
+	repo := walletlogsql.NewWalletLogSQLRepository(julodb)
+
+	transactionService := walletlog.NewWalletLogService(repo)
 	return transactionService
 }

@@ -88,7 +88,7 @@ func (s *TransactionWalletSQLRepository) ViewMyTransactionWallet(ctx context.Con
 	if walletId == "" {
 		return nil, nil
 	}
-	err := db.Model(&ViewTransactionWallet{}).Select("transaction_wallet.transaction_id, transaction_wallet.wallet_id, transaction_wallet.transaction_type, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("transaction_wallet.wallet_id = ?", walletId).Order("transaction_wallet.transaction_date asc").Scan(&data).First(&data).Error
+	err := db.Model(&ViewTransactionWallet{}).Select("transaction_wallet.transaction_id, transaction_wallet.wallet_id, transaction_wallet.transaction_type, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("transaction_wallet.wallet_id = ?", walletId).Order("transaction_wallet.transaction_date asc").Scan(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -124,7 +124,7 @@ func (s *TransactionWalletSQLRepository) Create(ctx context.Context, params *tra
 	return nil
 }
 
-func (v *ViewTransactionDetailWallet) ToViewDetailTransactionModel() *transaction.ViewTransactionDepositWallet {
+func (v *ViewTransactionDetailWallet) ToViewDetailTransactionDepositModel() *transaction.ViewTransactionDepositWallet {
 	return &transaction.ViewTransactionDepositWallet{
 		TransactionId:   v.TransactionId,
 		TransactionBy:   v.TransactionBy,
@@ -135,7 +135,7 @@ func (v *ViewTransactionDetailWallet) ToViewDetailTransactionModel() *transactio
 	}
 }
 
-func (s *TransactionWalletSQLRepository) GetViewDetailTransaction(ctx context.Context, transactionId string) (*transaction.ViewTransactionDepositWallet, error) {
+func (s *TransactionWalletSQLRepository) GetViewDetailDepositTransaction(ctx context.Context, transactionId string) (*transaction.ViewTransactionDepositWallet, error) {
 	var data *ViewTransactionDetailWallet
 	db := s.getDatabaseClient(ctx)
 	if transactionId == "" {
@@ -148,7 +148,34 @@ func (s *TransactionWalletSQLRepository) GetViewDetailTransaction(ctx context.Co
 		}
 		return nil, err
 	}
-	return data.ToViewDetailTransactionModel(), nil
+	return data.ToViewDetailTransactionDepositModel(), nil
+}
+
+func (v *ViewTransactionDetailWallet) ToViewDetailTransactionWithdrawalModel() *transaction.ViewTransactionWithdrawalWallet {
+	return &transaction.ViewTransactionWithdrawalWallet{
+		TransactionId:   v.TransactionId,
+		TransactionBy:   v.TransactionBy,
+		Status:          v.Status,
+		TransactionDate: v.TransactionDate,
+		Amount:          v.Amount,
+		ReferenceId:     v.ReferenceId,
+	}
+}
+
+func (s *TransactionWalletSQLRepository) GetViewDetailWithdrawalTransaction(ctx context.Context, transactionId string) (*transaction.ViewTransactionWithdrawalWallet, error) {
+	var data *ViewTransactionDetailWallet
+	db := s.getDatabaseClient(ctx)
+	if transactionId == "" {
+		return nil, nil
+	}
+	err := db.Model(&ViewTransactionDetailWallet{}).Select("transaction_wallet.transaction_id, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("transaction_wallet.transaction_id = ? ", transactionId).Scan(&data).First(&data).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return data.ToViewDetailTransactionWithdrawalModel(), nil
 }
 
 func (s *TransactionWalletSQLRepository) getDatabaseClient(ctx context.Context) *gorm.DB {

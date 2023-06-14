@@ -23,7 +23,7 @@ func (Wallet) TableName() string {
 type LinkedWalletDetail struct {
 	WalletId    string    `gorm:"column:wallet_id"`
 	CustomerXid string    `gorm:"column:customer_xid"`
-	Balance     string    `gorm:"column:balance"`
+	Balance     int       `gorm:"column:balance"`
 	DateLog     time.Time `gorm:"column:date_log"`
 	Status      string    `gorm:"column:status"`
 }
@@ -49,12 +49,13 @@ func (w *Wallet) ToServiceModel() *wallet.Wallet {
 	}
 }
 
-func (w *LinkedWalletDetail) ToLinkedServiceModel() *wallet.WalletDetail {
-	return &wallet.WalletDetail{
+func (w *LinkedWalletDetail) ToLinkedServiceModel() *wallet.EnabledWalletDetail {
+	return &wallet.EnabledWalletDetail{
 		WalletId:    w.WalletId,
 		CustomerXid: w.CustomerXid,
 		Status:      w.Status,
 		DateLog:     w.DateLog,
+		Balance:     w.Balance,
 	}
 }
 
@@ -111,8 +112,8 @@ func (s *WalletSQLRepository) Create(ctx context.Context, params *wallet.Wallet)
 	return nil
 }
 
-func (c *LinkedWalletDetail) ToServiceModelDetail() *wallet.WalletDetail {
-	return &wallet.WalletDetail{
+func (c *LinkedWalletDetail) ToServiceModelDetail() *wallet.EnabledWalletDetail {
+	return &wallet.EnabledWalletDetail{
 		WalletId:    c.WalletId,
 		CustomerXid: c.CustomerXid,
 		Status:      c.Status,
@@ -120,7 +121,7 @@ func (c *LinkedWalletDetail) ToServiceModelDetail() *wallet.WalletDetail {
 	}
 }
 
-func (s *WalletSQLRepository) GetByLinkedWallet(ctx context.Context, walletId string) (*wallet.WalletDetail, error) {
+func (s *WalletSQLRepository) GetByLinkedWallet(ctx context.Context, walletId string) (*wallet.EnabledWalletDetail, error) {
 	var data *LinkedWalletDetail
 	db := s.getDatabaseClient(ctx)
 	if walletId == "" {

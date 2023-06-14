@@ -3,6 +3,7 @@ package wallet_test
 import (
 	"context"
 	"fmt"
+	"herman-technical-julo/internal/log/walletlog"
 	"herman-technical-julo/internal/wallet"
 	"testing"
 
@@ -18,6 +19,7 @@ func TestWalletService_GetWalletByCustomerXid(t *testing.T) {
 					return nil, mockedErr
 				},
 			},
+			&walletlog.WalletLogService{},
 		)
 
 		convey.Convey("It should return the error", func() {
@@ -34,6 +36,7 @@ func TestWalletService_GetWalletByCustomerXid(t *testing.T) {
 					return nil, nil
 				},
 			},
+			&walletlog.WalletLogService{},
 		)
 
 		convey.Convey("It should return nil", func() {
@@ -56,6 +59,7 @@ func TestWalletService_GetWalletByCustomerXid(t *testing.T) {
 					return currentWallet, nil
 				},
 			},
+			&walletlog.WalletLogService{},
 		)
 
 		convey.Convey("It should return the wallet", func() {
@@ -74,7 +78,7 @@ func TestWalletService_Create(t *testing.T) {
 		StatusId:    0,
 		Balance:     0,
 	}
-	service := wallet.NewWalletService(&wallet.WalletRepositoryMock{})
+	service := wallet.NewWalletService(&wallet.WalletRepositoryMock{}, &walletlog.WalletLogService{})
 
 	convey.Convey("When wallet id is empty", t, func() {
 		convey.Convey("It should return error", func() {
@@ -109,6 +113,7 @@ func TestWalletService_Create(t *testing.T) {
 					return mockedErr
 				},
 			},
+			&walletlog.WalletLogService{},
 		)
 		convey.Convey("It should return the error", func() {
 			err := service.InitializeWallet(context.TODO(), params)
@@ -125,6 +130,7 @@ func TestWalletService_Create(t *testing.T) {
 					return nil
 				},
 			},
+			&walletlog.WalletLogService{},
 		)
 		convey.Convey("It should create wallet  based on given params", func() {
 			err := service.InitializeWallet(context.TODO(), params)

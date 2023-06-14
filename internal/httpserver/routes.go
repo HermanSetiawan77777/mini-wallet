@@ -29,10 +29,12 @@ func buildRoutes(appContainer *app.Application) http.Handler {
 	}).Methods(http.MethodGet)
 
 	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleEnableWallet(appContainer.Services.WalletService)).Methods(http.MethodPost)
+	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleDisabledWallet(appContainer.Services.WalletService)).Methods(http.MethodPatch)
 	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleViewWallet(appContainer.Services.WalletService)).Methods(http.MethodGet)
 
 	authRouter.HandleFunc("/api/v1/wallet/transactions", transactionhttp.HandleViewTransaction(appContainer.Services.TransactionService)).Methods(http.MethodGet)
 	authRouter.HandleFunc("/api/v1/wallet/deposits", transactionhttp.HandleDepositedTransaction(appContainer.Services.TransactionService)).Methods(http.MethodPost)
+	authRouter.HandleFunc("/api/v1/wallet/withdrawals", transactionhttp.HandleWithdrawalTransaction(appContainer.Services.TransactionService)).Methods(http.MethodPost)
 
 	return root
 }

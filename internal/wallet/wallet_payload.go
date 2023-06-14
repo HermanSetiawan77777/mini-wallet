@@ -17,13 +17,13 @@ func (p *InitializeWalletParam) Validate() error {
 	return nil
 }
 
-type EnableWalletParam struct {
+type EnableDisableWalletParam struct {
 	WalletId string `json:"wallet_id"`
 	StatusId int    `json:"status_id"`
 	Balance  int    `json:"balance"`
 }
 
-func (p *EnableWalletParam) Validate() error {
+func (p *EnableDisableWalletParam) Validate() error {
 	if p.WalletId == "" {
 		return ErrWalletIdNil
 	}

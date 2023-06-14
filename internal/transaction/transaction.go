@@ -38,15 +38,26 @@ type ViewTransactionDepositWallet struct {
 	ReferenceId     string    `json:"reference_id"`
 }
 
+type ViewTransactionWithdrawalWallet struct {
+	TransactionId   string    `json:"id"`
+	TransactionBy   string    `json:"withdrawn_by"`
+	Status          string    `json:"status"`
+	TransactionDate time.Time `json:"withdrawn_at"`
+	Amount          int       `json:"amount"`
+	ReferenceId     string    `json:"reference_id"`
+}
+
 type TransactionWalletRepository interface {
 	ViewMyTransactionWallet(ctx context.Context, walletId string) ([]*ViewTransactionWallet, error)
 	Create(ctx context.Context, params *TransactionWallet) error
-	GetViewDetailTransaction(ctx context.Context, transactionId string) (*ViewTransactionDepositWallet, error)
+	GetViewDetailDepositTransaction(ctx context.Context, transactionId string) (*ViewTransactionDepositWallet, error)
+	GetViewDetailWithdrawalTransaction(ctx context.Context, transactionId string) (*ViewTransactionWithdrawalWallet, error)
 }
 
 type TransactionWalletIService interface {
 	ViewMyTransactionWallet(ctx context.Context, walletId string) ([]*ViewTransactionWallet, error)
 	DepositTransaction(ctx context.Context, params *CreateTransactionParam) (*ViewTransactionDepositWallet, error)
+	WithdrawalTransaction(ctx context.Context, params *CreateTransactionParam) (*ViewTransactionWithdrawalWallet, error)
 }
 
 type TransactionWalletService struct {
@@ -116,7 +127,58 @@ func (s *TransactionWalletService) DepositTransaction(ctx context.Context, param
 		return nil, err
 	}
 
-	view, err := s.repository.GetViewDetailTransaction(ctx, idString)
+	view, err := s.repository.GetViewDetailDepositTransaction(ctx, idString)
+	if err != nil {
+		return nil, err
+	}
+
+	return view, nil
+}
+
+func (s *TransactionWalletService) WithdrawalTransaction(ctx context.Context, params *CreateTransactionParam) (*ViewTransactionWithdrawalWallet, error) {
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+	if params.TransactionBy == "" {
+		return nil, ErrTransactionByNil
+	}
+	statusWallet, err := s.walletService.GetByWalletId(ctx, params.WalletId)
+	if err != nil {
+		return nil, err
+	}
+	if statusWallet.StatusId == 1 {
+		return nil, ErrWalletDeactive
+	}
+	if statusWallet.Balance < params.Amount {
+		return nil, ErrAmountNotEnough
+	}
+
+	id := uuid.New()
+	idString := id.String()
+	data := &TransactionWallet{
+		WalletId:        params.WalletId,
+		TransactionId:   idString,
+		Status:          1,
+		TransactionType: "withdrawal",
+		TransactionBy:   params.TransactionBy,
+		Amount:          params.Amount,
+		ReferenceId:     params.ReferenceId,
+	}
+	err = s.repository.Create(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.walletService.UpdateBalanceWallet(ctx, &wallet.UpdateBalanceWalletParam{
+		WalletId: params.WalletId,
+		Balance:  statusWallet.Balance - params.Amount,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	view, err := s.repository.GetViewDetailWithdrawalTransaction(ctx, idString)
 	if err != nil {
 		return nil, err
 	}
