@@ -2,6 +2,7 @@ package app
 
 import (
 	"herman-technical-julo/internal/auth"
+	"herman-technical-julo/internal/transaction"
 	"herman-technical-julo/internal/wallet"
 )
 
@@ -10,6 +11,7 @@ type Application struct {
 }
 
 type Services struct {
-	AuthService   auth.AuthIService
-	WalletService wallet.WalletIService
+	AuthService        auth.AuthIService
+	WalletService      wallet.WalletIService
+	TransactionService transaction.TransactionWalletIService
 }

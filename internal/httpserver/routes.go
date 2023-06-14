@@ -6,6 +6,7 @@ import (
 	"herman-technical-julo/internal/httpserver/middleware/authenticator"
 	muxauth "herman-technical-julo/internal/httpserver/middleware/authenticator/mux"
 	"herman-technical-julo/internal/httpserver/response"
+	transactionhttp "herman-technical-julo/internal/transaction/http"
 	wallethttp "herman-technical-julo/internal/wallet/http"
 	"net/http"
 
@@ -29,6 +30,8 @@ func buildRoutes(appContainer *app.Application) http.Handler {
 
 	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleEnableWallet(appContainer.Services.WalletService)).Methods(http.MethodPost)
 	authRouter.HandleFunc("/api/v1/wallet", wallethttp.HandleViewWallet(appContainer.Services.WalletService)).Methods(http.MethodGet)
+
+	authRouter.HandleFunc("/api/v1/wallet/transactions", transactionhttp.HandleViewWallet(appContainer.Services.TransactionService)).Methods(http.MethodGet)
 
 	return root
 }

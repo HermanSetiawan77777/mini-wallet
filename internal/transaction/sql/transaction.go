@@ -61,7 +61,7 @@ func (s *TransactionWalletSQLRepository) ViewMyTransactionWallet(ctx context.Con
 	if walletId == "" {
 		return nil, nil
 	}
-	err := db.Model(&ViewTransactionWallet{}).Select("transaction_wallet.transaction_id, transaction_wallet.wallet_id, transaction_wallet.transaction_type, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("wallet.wallet_id = ?", walletId).Order("transaction_wallet.transaction_date asc").Scan(&data).First(&data).Error
+	err := db.Model(&ViewTransactionWallet{}).Select("transaction_wallet.transaction_id, transaction_wallet.wallet_id, transaction_wallet.transaction_type, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("transaction_wallet.wallet_id = ?", walletId).Order("transaction_wallet.transaction_date asc").Scan(&data).First(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
