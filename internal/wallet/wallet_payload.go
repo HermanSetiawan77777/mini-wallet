@@ -29,3 +29,18 @@ func (p *EnableWalletParam) Validate() error {
 	}
 	return nil
 }
+
+type UpdateBalanceWalletParam struct {
+	WalletId string `json:"wallet_id"`
+	Balance  int    `json:"balance"`
+}
+
+func (p *UpdateBalanceWalletParam) Validate() error {
+	if p.WalletId == "" {
+		return ErrWalletIdNil
+	}
+	if p.Balance == 0 {
+		return ErrAmountZero
+	}
+	return nil
+}

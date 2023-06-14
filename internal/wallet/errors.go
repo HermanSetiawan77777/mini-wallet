@@ -8,3 +8,4 @@ var ErrStatusZero = errors.NewDefaultValidationError("Status cannot 0", "status 
 var ErrWalletIdNotExist = errors.NewDefaultValidationError("Wallet id not exist", "Wallet id not exist")
 var ErrWalletAlreadyEnabled = errors.NewDefaultValidationError("Failed, Wallet already enabled", "failed, wallet already enabled")
 var ErrWalletDeactive = errors.NewDefaultValidationError("Wallet disabled", "wallet disabled")
+var ErrAmountZero = errors.NewDefaultValidationError("Transaction amount cannot 0", "transaction amount cannot 0")

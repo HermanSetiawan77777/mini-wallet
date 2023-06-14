@@ -24,6 +24,33 @@ func (ViewTransactionWallet) TableName() string {
 	return "transaction_wallet"
 }
 
+type TransactionWallet struct {
+	TransactionId   string `gorm:"column:transaction_id"`
+	WalletId        string `gorm:"column:wallet_id"`
+	Status          int    `gorm:"column:status"`
+	TransactionType string `gorm:"column:transaction_type"`
+	TransactionBy   string `gorm:"column:transaction_by"`
+	Amount          int    `gorm:"column:amount"`
+	ReferenceId     string `gorm:"column:reference_id"`
+}
+
+func (TransactionWallet) TableName() string {
+	return "transaction_wallet"
+}
+
+type ViewTransactionDetailWallet struct {
+	TransactionId   string    `gorm:"column:transaction_id"`
+	TransactionBy   string    `gorm:"column:transaction_by"`
+	Status          string    `gorm:"column:status"`
+	TransactionDate time.Time `gorm:"column:transaction_date"`
+	Amount          int       `gorm:"column:amount"`
+	ReferenceId     string    `gorm:"column:reference_id"`
+}
+
+func (ViewTransactionDetailWallet) TableName() string {
+	return "transaction_wallet"
+}
+
 type TransactionWalletSQLRepository struct {
 	db *gorm.DB
 }
@@ -69,6 +96,59 @@ func (s *TransactionWalletSQLRepository) ViewMyTransactionWallet(ctx context.Con
 		return nil, err
 	}
 	return ToServiceSliceTransactionWallet(data), nil
+}
+
+func newTransactionFromServiceModel(data *transaction.TransactionWallet) *TransactionWallet {
+	if data == nil {
+		return nil
+	}
+
+	return &TransactionWallet{
+		WalletId:        data.WalletId,
+		TransactionId:   data.TransactionId,
+		Status:          data.Status,
+		TransactionType: data.TransactionType,
+		TransactionBy:   data.TransactionBy,
+		Amount:          data.Amount,
+		ReferenceId:     data.ReferenceId,
+	}
+}
+
+func (s *TransactionWalletSQLRepository) Create(ctx context.Context, params *transaction.TransactionWallet) error {
+	payload := newTransactionFromServiceModel(params)
+	errs := s.db.Create(&payload).Error
+	if errs != nil {
+		return errs
+	}
+
+	return nil
+}
+
+func (v *ViewTransactionDetailWallet) ToViewDetailTransactionModel() *transaction.ViewTransactionDepositWallet {
+	return &transaction.ViewTransactionDepositWallet{
+		TransactionId:   v.TransactionId,
+		TransactionBy:   v.TransactionBy,
+		Status:          v.Status,
+		TransactionDate: v.TransactionDate,
+		Amount:          v.Amount,
+		ReferenceId:     v.ReferenceId,
+	}
+}
+
+func (s *TransactionWalletSQLRepository) GetViewDetailTransaction(ctx context.Context, transactionId string) (*transaction.ViewTransactionDepositWallet, error) {
+	var data *ViewTransactionDetailWallet
+	db := s.getDatabaseClient(ctx)
+	if transactionId == "" {
+		return nil, nil
+	}
+	err := db.Model(&ViewTransactionDetailWallet{}).Select("transaction_wallet.transaction_id, transaction_status.status, transaction_wallet.transaction_by, transaction_wallet.transaction_date, transaction_wallet.amount, transaction_wallet.reference_id").Joins("INNER join transaction_status ON transaction_wallet.status=transaction_status.status_id").Where("transaction_wallet.transaction_id = ? ", transactionId).Scan(&data).First(&data).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return data.ToViewDetailTransactionModel(), nil
 }
 
 func (s *TransactionWalletSQLRepository) getDatabaseClient(ctx context.Context) *gorm.DB {

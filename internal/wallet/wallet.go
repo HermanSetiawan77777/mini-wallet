@@ -33,6 +33,7 @@ type WalletIService interface {
 	GetByLinkedWallet(ctx context.Context, walletId string) (*WalletDetail, error)
 	EnableWallet(ctx context.Context, payload *EnableWalletParam) (*WalletDetail, error)
 	GetByWalletId(ctx context.Context, walletId string) (*Wallet, error)
+	UpdateBalanceWallet(ctx context.Context, payload *UpdateBalanceWalletParam) error
 }
 
 type WalletService struct {
@@ -126,4 +127,28 @@ func (s *WalletService) EnableWallet(ctx context.Context, params *EnableWalletPa
 	}
 
 	return currentWallet, nil
+}
+
+func (s *WalletService) UpdateBalanceWallet(ctx context.Context, payload *UpdateBalanceWalletParam) error {
+	err := payload.Validate()
+	if err != nil {
+		return err
+	}
+	targetWallet, err := s.repository.GetByWalletId(ctx, payload.WalletId)
+	if err != nil {
+		return err
+	}
+	if targetWallet == nil {
+		return ErrWalletIdNotExist
+	}
+	if targetWallet.StatusId == 1 {
+		return ErrWalletDeactive
+	}
+	targetWallet.Balance = payload.Balance
+
+	if err = s.repository.Update(ctx, targetWallet); err != nil {
+		return err
+	}
+
+	return nil
 }
